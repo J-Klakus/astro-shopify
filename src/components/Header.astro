@@ -4,19 +4,59 @@ import CartIcon from "./CartIcon.svelte";
 ---
 
 <header class="sticky top-0 z-40">
-  <div class="border-b bg-white/70 py-3 backdrop-blur-2xl">
-    <nav class="container grid grid-cols-3 items-center">
-      <a href="/">
-        <span class="sr-only">Logo</span>
-        <Logo />
-      </a>
-      <h1
-        class="flex justify-center text-sm font-semibold text-gray-900 sm:text-xl"
-      >
-        Astro 🧑‍🚀 Shopify
-      </h1>
-      <div class="justify-self-end">
-        <CartIcon client:load />
+  <div
+    class="border-b bg-gradient-to-r from-teal-500 via-teal-400 to-cyan-200 py-3 backdrop-blur-2xl"
+  >
+    <nav>
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 justify-between">
+          <div class="flex items-center">
+            <a href="#" class="text-lg font-semibold text-white"
+              ><img src="./logo.avif" alt="logo" /></a
+            >
+          </div>
+
+          <!-- Navigation Links -->
+          <div class="hidden items-center space-x-4 md:flex">
+            <a href="#" class="text-black hover:opacity-80">Order Now</a>
+            <a href="#" class="text-black hover:opacity-80">Contact</a>
+            <a href="#" class="text-black hover:opacity-80">Track Your Order</a>
+            <a href="#" class="text-black hover:opacity-80">Policies</a>
+          </div>
+          <div class="justify-self-end">
+            <CartIcon client:load />
+          </div>
+
+          <!-- Hamburger Menu for Mobile -->
+          <div class="flex items-center md:hidden">
+            <button class="text-black hover:opacity-80 focus:outline-none">
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16m-7 6h7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu (hidden by default) -->
+      <div class="hidden md:hidden">
+        <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+          <a href="#" class="block text-black hover:opacity-80">Order Now</a>
+          <a href="#" class="block text-black hover:opacity-80">Contact</a>
+          <a href="#" class="block text-black hover:opacity-80"
+            >Track Your Order</a
+          >
+          <a href="#" class="block text-black hover:opacity-80">Policies</a>
+        </div>
       </div>
     </nav>
   </div>
