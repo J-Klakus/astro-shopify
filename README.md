@@ -1,73 +1,143 @@
-# Astro starter theme to build a headless ecommerce website with Shopify
+# Astro Shopify storefront
 
-The theme is built with Svelte but you can use any framework you like (React, Vue, Solid etc.) thanks to Astro.
-Tailwind UI free components are used for the design.
+A server-rendered headless storefront starter built with Astro, Svelte, and the Shopify Storefront API. It includes a product page, a persistent cart drawer, and a small Tailwind UI design system.
 
-![astro_shopify_preview](https://user-images.githubusercontent.com/10447155/214480671-8380f410-cbfb-4f53-a6bb-5c744073e2f2.jpg)
+![Storefront preview](https://user-images.githubusercontent.com/10447155/214480671-8380f410-cbfb-4f53-a6bb-5c744073e2f2.jpg)
 
-## 🧑‍🚀 Where to start
+## Features
 
-1. Create a `.env` file based on `.env.example` with your Shopify store url and your public and private access tokens
-2. The credentials are used inside the `/utils/config.ts` file, you can update the API version there
-3. Run `npm install` or `yarn` or `pnpm install`
-4. Run `npm run dev` or `yarn run dev` or `pnpm run dev`
+- Server-side rendering on Vercel
+- Product listing and product detail pages by handle
+- Shopify cart creation, line item updates, and checkout handoff
+- Cart persisted in `localStorage` and restored on the next visit
+- Product image gallery, breadcrumbs, price, stock state, and recommendations
+- Product accordions and a review section
+- Zod validation for every Storefront API response
+- Responsive layout built with Tailwind UI patterns
+- Custom 404 page
 
-## Shopify Configuration Guide
+## Stack
 
-- Create a new account or use an existing one. https://accounts.shopify.com/store-login
-- Add the [Shopify Headless channel](https://apps.shopify.com/headless) to your store
-- Click on `Add Storefront`
-- Copy/Paste your `public` and `private` access tokens to your .env file
-- Next, check Storefront API access scopes
-  - `unauthenticated_read_product_listings` and `unauthenticated_read_product_inventory` access should be fine to get you started.
-  - Add more scopes if you require additional permissions.
+| Layer | Choice |
+| --- | --- |
+| Framework | Astro 2 with `output: "server"` |
+| UI islands | Svelte 3 |
+| Styling | Tailwind CSS 3 |
+| Commerce | Shopify Storefront API, `@shopify/hydrogen-react` |
+| Cart state | `nanostores` and `@nanostores/persistent` |
+| Validation | Zod |
+| Deployment | Vercel adapter |
 
-### Shopify Troubleshooting
+## Requirements
 
-- If you encounter an error like `error code 401` you likely didn't set this up correctly. Revisit your scopes and be sure add at least one test product. Also make sure you are using the `Storefront API` and not the `Admin API` as the endpoints and scopes are different.
-- If you do not see a checkout sidebar, or if it is empty after adding a product, you need to add an image to your test product.
+- Node.js 18 or newer
+- A Shopify store
+- The [Shopify Headless channel](https://apps.shopify.com/headless) installed on that store
+- A test product with at least one image
 
-## 🚀 Project Structure
+## Quick start
 
-Inside the project, you'll see the following folders and files:
-
+```bash
+pnpm install
+pnpm dev
 ```
+
+The dev server runs at <http://localhost:3000>. Create a `.env` file first with the values below.
+
+```dotenv
+PUBLIC_SHOPIFY_SHOP=your-store.myshopify.com
+PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your-public-storefront-token
+PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your-private-storefront-token
+```
+
+`PUBLIC_` variables are exposed to the browser. The private token is only read during server-side requests, so never expose it in client code or commit `.env`.
+
+The dev server runs at <http://localhost:3000>.
+
+## Shopify setup
+
+1. Open the [Shopify admin](https://accounts.shopify.com/store-login) and install the Headless channel.
+2. Create a storefront.
+3. Copy the public and private Storefront API access tokens into `.env`.
+4. Confirm the Storefront API scopes include:
+   - `unauthenticated_read_product_listings`
+   - `unauthenticated_read_product_inventory`
+5. Add at least one product with an image, then restart the dev server.
+
+If you get `401` responses, check that you used the Storefront API tokens rather than Admin API tokens, and that the product is available to the storefront.
+
+## Environment variables
+
+| Variable | Purpose |
+| --- | --- |
+| `PUBLIC_SHOPIFY_SHOP` | Shopify store domain, for example `my-store.myshopify.com` |
+| `PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Public Storefront API token used in browser requests |
+| `PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Private Storefront API token used in server requests |
+
+The Storefront API version is set in `src/utils/config.ts` and currently points at `2023-01`.
+
+## Scripts
+
+| Command | Action |
+| --- | --- |
+| `pnpm dev` | Start the dev server on port 3000 |
+| `pnpm build` | Build the production site into `dist/` |
+| `pnpm preview` | Preview the production build |
+| `pnpm astro ...` | Run Astro CLI commands |
+
+The repo contains both `package-lock.json` and `pnpm-lock.yaml`. Pick one package manager and delete the other lockfile before shipping.
+
+## Project structure
+
+```text
 /
 ├── public/
 ├── src/
-│   └── components/
-│       └── Header.astro
-│   └── layouts/
-│       └── BaseLayout.astro
-│   └── pages/
-│       └── index.astro
-│   └── stores/
-│       └── cart.ts
-│   └── styles/
-│       └── global.css
+│   ├── components/          # Astro and Svelte UI, cart, product sections
+│   ├── layouts/             # Base and 404 layouts
+│   ├── pages/
+│   │   ├── index.astro      # Product listing
+│   │   └── products/[...handle].astro
+│   ├── stores/cart.ts       # Persistent cart store and cart mutations
+│   ├── styles/global.css
 │   └── utils/
-│       └── shopify.ts
+│       ├── config.ts        # Shopify env and API version
+│       ├── graphql.ts       # Storefront queries and mutations
+│       ├── schemas.ts       # Zod response schemas
+│       └── shopify.ts       # Storefront API client
+├── astro.config.mjs
 └── package.json
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## How it works
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+`src/utils/shopify.ts` is the only place that talks to Shopify. It posts GraphQL operations from `graphql.ts`, parses the response with Zod schemas, and returns typed data to Astro pages and Svelte islands.
 
-Any static assets, like images, can be placed in the `public/` directory.
+Requests are split by environment:
 
-## 🧞 Commands
+- Server requests use `PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN` and forward the buyer IP.
+- Browser requests use `PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN`.
 
-All commands are run from the root of the project, from a terminal:
+The cart lives in `src/stores/cart.ts` and is persisted under the `cart` key. On the first request of a session, the store fetches the cart again to confirm Shopify has not expired it.
 
-| Command                | Action                                           |
-| :--------------------- | :----------------------------------------------- |
-| `npm install`          | Installs dependencies                            |
-| `npm run dev`          | Starts local dev server at `localhost:3000`      |
-| `npm run build`        | Build your production site to `./dist/`          |
-| `npm run preview`      | Preview your build locally, before deploying     |
-| `npm run astro ...`    | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro --help` | Get help using the Astro CLI                     |
+## Deployment
 
-## ⚡️ Lighthouse
-![lighthouse_astro_shopify](https://user-images.githubusercontent.com/10447155/214448698-ce2a1ef6-6fbd-4fca-b8b6-c5194b72a15b.jpg)
+The project uses the Vercel serverless adapter.
+
+```bash
+pnpm build
+```
+
+Set the three Shopify variables in the Vercel project, then deploy. If you deploy somewhere else, replace `@astrojs/vercel/serverless` in `astro.config.mjs` with the adapter for that platform and keep `output: "server"`.
+
+## Notes and limits
+
+- The Storefront API version is pinned to `2023-01`, and Astro 2 is several major versions behind current. Update both before using this as a production base.
+- The homepage calls `getProducts` without a limit, and the function defaults to one product. Pass a larger `limit` when you want a full catalog grid.
+- The starter covers products and carts only. Collections, search, customer accounts, discounts, and inventory alerts are not implemented.
+- Product reviews are presentational and do not submit anywhere.
+- Checkout is handed off to Shopify through `cart.checkoutUrl`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
